@@ -1,4 +1,5 @@
 <?php
+namespace modele;
 // Projet TraceGPS
 // fichier : modele/DAO.test.php
 // Rôle : test de la classe DAO.class.php
@@ -15,7 +16,7 @@
 
 <?php
 // connexion du serveur web à la base MySQL
-include_once ('DAO.class.php');
+include_once ('DAO.php');
 //include_once ('_DAO.mysql.class.php');
 $dao = new DAO();
 

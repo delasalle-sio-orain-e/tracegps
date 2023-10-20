@@ -1,4 +1,5 @@
 <?php
+namespace modele;
 // Projet TraceGPS - version web mobile
 // fichier : modele/parametres.localhost.php
 // Rôle : inclure les paramètres de l'application (hébergement en localhost)
