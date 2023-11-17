@@ -953,6 +953,146 @@ class DAO
     // --------------------------------------------------------------------------------------
     
     
+    public function autoriseAConsulter($idAutorisant, $idAutorise){
+        // préparation de la requête de recherche
+        $txt_req = "Select count(*) from tracegps_autorisations where idAutorisant = :idAutorisant and idAutorise = :idAutorise";
+        $req = $this->cnx->prepare($txt_req);
+        // liaison de la requête et de ses paramètres
+        $req->bindValue("idAutorisant", $idAutorisant, \PDO::PARAM_INT);
+        $req->bindValue("idAutorise", $idAutorise, \PDO::PARAM_INT);
+        // exécution de la requête
+        $req->execute();
+        $autorise = $req->fetchColumn(0);
+        // libère les ressources du jeu de données
+        $req->closeCursor();
+        
+        // fourniture de la réponse
+        if ($autorise == 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
+        
+    }
+    
+    public function getLesPointsDeTrace($idTrace){
+        
+        // préparation de la requête de recherche
+        $txt_req = "Select *";
+        $txt_req .= " from tracegps_points";
+        $txt_req .= " where idTrace = :idTrace";
+        $txt_req .= " order by id";
+        
+        $req = $this->cnx->prepare($txt_req);
+        // liaison de la requête et de ses paramètres
+        $req->bindValue("idTrace", $idTrace, \PDO::PARAM_INT);
+        // extraction des données
+        $req->execute();
+        $uneLigne = $req->fetch(\PDO::FETCH_OBJ);
+        
+        // construction d'une collection d'objets Utilisateur
+        $lesPointDeTrace = array();
+        // tant qu'une ligne est trouvée :
+        while ($uneLigne) {
+            // création d'un objet Utilisateur
+            $unIdTrace = mb_convert_encoding($uneLigne->idTrace, "UTF-8");
+            $unId = mb_convert_encoding($uneLigne->id, "UTF-8");
+            $uneLatitude = mb_convert_encoding($uneLigne->latitude, "UTF-8");
+            $uneLongitude = mb_convert_encoding($uneLigne->longitude, "UTF-8");
+            $uneAltitude = mb_convert_encoding($uneLigne->altitude, "UTF-8");
+            $uneDateHeure = mb_convert_encoding($uneLigne->dateHeure, "UTF-8");
+            $unRythmeCardio = mb_convert_encoding($uneLigne->rythmeCardio, "UTF-8");
+            $unTempsCumule = 0;
+            $uneDistanceCumulee =0;
+            $uneVitesse = 0;
+            
+            $unPoint = new PointDeTrace($unIdTrace, $unId, $uneLatitude, $uneLongitude, $uneAltitude, $uneDateHeure, $unRythmeCardio, $unTempsCumule, $uneDistanceCumulee, $uneVitesse);
+            // ajout de l'utilisateur à la collection
+            $lesPointDeTrace[] = $unPoint;
+            // extrait la ligne suivante
+            $uneLigne = $req->fetch(\PDO::FETCH_OBJ);
+        }
+        // libère les ressources du jeu de données
+        $req->closeCursor();
+        // fourniture de la collection
+        return $lesPointDeTrace;
+        
+    }
+    
+    public function getToutesLesTraces(){
+        // préparation de la requête de recherche
+        $txt_req = "Select *";
+        $txt_req .= " from tracegps_traces";
+        $txt_req .= " order by id";
+        
+        $req = $this->cnx->prepare($txt_req);
+        
+        // extraction des données
+        $req->execute();
+        $uneLigne = $req->fetch(\PDO::FETCH_OBJ);
+        
+        // construction d'une collection d'objets Utilisateur
+        $trace = array();
+        // tant qu'une ligne est trouvée :
+        while ($uneLigne) {
+            // création d'un objet Utilisateur
+            $unId = mb_convert_encoding($uneLigne->id, "UTF-8");
+            $uneDateHeureDebut = mb_convert_encoding($uneLigne->dateDebut, "UTF-8");
+            if ($uneLigne->dateFin != NULL) {
+                $uneDateHeureFin = mb_convert_encoding($uneLigne->dateFin, "UTF-8");
+            }
+            else {
+                $uneDateHeureFin = NULL;
+            }
+            
+            $terminee = mb_convert_encoding($uneLigne->terminee, "UTF-8");
+            $unIdUtilisateur = mb_convert_encoding($uneLigne->idUtilisateur, "UTF-8");
+            
+            
+            $uneTrace = new Trace($unId, $uneDateHeureDebut, $uneDateHeureFin, $terminee, $unIdUtilisateur);
+            $uneTrace->setLesPointsDeTrace($this->getLesPointsDeTrace($unId));
+            
+            // ajout de la trace à la collection
+            $trace[] = $uneTrace;
+            // extrait la ligne suivante
+            $uneLigne = $req->fetch(\PDO::FETCH_OBJ);
+        }
+        // libère les ressources du jeu de données
+        $req->closeCursor();
+        // fourniture de la collection
+        return $trace;
+        
+    }
+    
+    
+    public function supprimerUneTrace($idTrace) {
+        // préparation de la requête de supression
+        $txt_req = "DELETE from tracegps_points  WHERE idTrace = :idTrace";
+        $req = $this->cnx->prepare($txt_req);
+        // liaison de la requête et de ses paramètres
+        $req->bindValue("idTrace", $idTrace, \PDO::PARAM_INT);
+        // exécution de la requête
+        $req->execute();
+        // préparation de la requête de supression
+        $txt_req2 = "DELETE from tracegps_traces  WHERE id = :idTrace";
+        $req2 = $this->cnx->prepare($txt_req2);
+        $req2->bindValue("idTrace", $idTrace, \PDO::PARAM_INT);
+        // exécution de la requête
+        $req2->execute();
+        // vérification du résultat
+        $ok = $req2->rowCount();
+        // libère les ressources du jeu de données
+        $req->closeCursor();
+        
+        
+        
+        if ($ok > 0) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
     
     
     
