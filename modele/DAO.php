@@ -705,7 +705,84 @@ class DAO
     
     
     
+    public function existeAdrMailUtilisateur($adrMail)
+    {
+        // prÃ©paration de la requÃªte de recherche
+        $txt_req = "Select adrMail from tracegps_utilisateurs where adrMail = :adrMail";
+        $req = $this->cnx->prepare($txt_req);
+        // liaison de la requÃªte et de ses paramÃ¨tres
+        $req->bindValue("adrMail", $adrMail, \PDO::PARAM_STR);
+        // exÃ©cution de la requÃªte
+        $req->execute();
+        $nbReponses = $req->fetchColumn(0);
+        // libÃ¨re les ressources du jeu de donnÃ©es
+        $req->closeCursor();
+        
+        // fourniture de la rÃ©ponse
+        if ($nbReponses == 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
     
+    public function creerUneAutorisation($idAutorisant, $idAutorise)
+    {
+        if ($this->autoriseAConsulter($idAutorisant,$idAutorise) == true) return false;
+        
+        // préparation de la requête
+        $txt_req1 = "insert into tracegps_autorisations (idAutorisant,idAutorise)";
+        $txt_req1 .= " values (:idAutorisant, :idAutorise)";
+        $req1 = $this->cnx->prepare($txt_req1);
+        // liaison de la requête et de ses paramètres
+        $req1->bindValue("idAutorisant", $idAutorisant, \PDO::PARAM_STR);
+        $req1->bindValue("idAutorise", $idAutorise, \PDO::PARAM_STR);
+        // exécution de la requête
+        $ok = $req1->execute();
+        // sortir en cas d'échec
+        if ( ! $ok) { return false; }
+        return true;
+    }
+    
+    
+    
+    public  function getUneTrace($idTrace)
+    {
+        // préparation de la requête de recherche
+        $txt_req = "Select * from tracegps_traces where id=:id";
+        $req = $this->cnx->prepare($txt_req);
+        // liaison de la requête et de ses paramètres
+        $req->bindValue("id", $idTrace, \PDO::PARAM_INT);
+        // extraction des données
+        $req->execute();
+        $laTrace = $req->fetch(\PDO::FETCH_OBJ);
+        // traitement de la réponse
+        if($laTrace->dateFin != null)
+        {
+            $uneDateHeureFin = mb_convert_encoding($laTrace->dateFin, "UTF-8");
+        }
+        else {
+            $uneDateHeureFin = NULL;
+        }
+        
+        
+        $terminee = mb_convert_encoding($laTrace->terminee, "UTF-8");
+        
+        $unIdUtilisateur = mb_convert_encoding($laTrace->idUtilisateur, "UTF-8");
+        
+        $unId = mb_convert_encoding($laTrace->id, "UTF-8");
+        
+        $uneDateHeureDebut = mb_convert_encoding($laTrace->dateDebut, "UTF-8");
+        
+        
+        $newTrace = new Trace($unId, $uneDateHeureDebut, $uneDateHeureFin, $terminee, $unIdUtilisateur);
+        
+        $newTrace ->setLesPointsDeTrace($this->getLesPointsDeTrace($unId));
+        
+        return $newTrace;
+        
+    }
     
     
     
