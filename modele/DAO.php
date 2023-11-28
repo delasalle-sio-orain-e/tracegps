@@ -15,7 +15,6 @@ use Exception;
 // existePseudoUtilisateur($pseudo) : fournit true si le pseudo $pseudo existe dans la table tracegps_utilisateurs, false sinon
 // getUnUtilisateur($login) : fournit un objet Utilisateur à partir de $login (son pseudo ou son adresse mail)
 // getTousLesUtilisateurs() : fournit la collection de tous les utilisateurs (de niveau 1)
-// creerUnUtilisateur($unUtilisateur) : enregistre l'utilisateur $unUtilisateur dans la bdd
 // modifierMdpUtilisateur($login, $nouveauMdp) : enregistre le nouveau mot de passe $nouveauMdp de l'utilisateur $login daprès l'avoir hashé en SHA1
 // supprimerUnUtilisateur($login) : supprime l'utilisateur $login (son pseudo ou son adresse mail) dans la bdd, ainsi que ses traces et ses autorisations
 // envoyerMdp($login, $nouveauMdp) : envoie un mail à l'utilisateur $login avec son nouveau mot de passe $nouveauMdp
@@ -781,6 +780,179 @@ class DAO
         $newTrace ->setLesPointsDeTrace($this->getLesPointsDeTrace($unId));
         
         return $newTrace;
+        
+    }
+    
+    
+    public function getLesUtilisateursAutorisant($idUtilisateur) {
+        // V2
+        $collectionUtilisateur = array();
+        
+        $txt_req = "SELECT idAutorisant FROM tracegps_autorisations WHERE idAutorise = :idAutorise";
+        $req = $this->cnx->prepare($txt_req);
+        // liaison de la requête et de ses paramètres
+        $req->bindValue("idAutorise", $idUtilisateur, \PDO::PARAM_INT);
+        // exécution de la requête
+        $req->execute();
+        
+        $lignes = $req->fetchAll(\PDO::FETCH_COLUMN);
+        
+        foreach($lignes as $unId)
+        {
+            $txt_req = "SELECT pseudo FROM tracegps_vue_utilisateurs WHERE niveau = 1 AND id = :id";
+            $req = $this->cnx->prepare($txt_req);
+            // liaison de la requête et de ses paramètres
+            $req->bindValue("id", $unId, \PDO::PARAM_INT);
+            // exécution de la requête
+            $req->execute();
+            
+            $unPseudo = $req->fetch(\PDO::FETCH_OBJ);
+            
+            $pseudo = mb_convert_encoding($unPseudo->pseudo, "UTF-8");
+            
+            $unUtilisateur = $this->getUnUtilisateur($pseudo);
+            
+            $collectionUtilisateur[] = $unUtilisateur;
+        }
+        // libère les ressources du jeu de données
+        $req->closeCursor();
+        
+        return $collectionUtilisateur;
+    }
+    
+    public function supprimerUneAutorisation($idAutorisant, $idAutorise){
+        // $creationAutorisation = $this->creeUneAutorisation($idAutorisant, $idAutorise);
+        
+        $txt_req = "DELETE FROM tracegps_autorisations WHERE idAutorisant = :idAutorisant AND idAutorise = :idAutorise";
+        $req = $this->cnx->prepare($txt_req);
+        
+        $req->bindValue("idAutorise", $idAutorise, \PDO::PARAM_INT);
+        
+        $req->bindValue("idAutorisant", $idAutorisant, \PDO::PARAM_INT);
+        
+        // exécution de la requête
+        $req->execute();
+        
+        $ok = $req->rowCount();
+        // liaison de la requête et de ses paramètres
+        //$req->bindValue("idAutorisant", $unId, \PDO::PARAM_INT);
+        // exécution de la requête
+        
+        
+        if ($ok > 0) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+        
+    }
+    
+    
+    
+    
+    
+    public function getLesTraces($idUtilisateur){
+        
+        
+        $txt_req = "SELECT * ";
+        $txt_req .= "FROM tracegps_traces ";
+        $txt_req .= "WHERE idUtilisateur = :idUtilisateur";
+        
+        $req = $this->cnx->prepare($txt_req);
+        
+        $req->bindValue("idUtilisateur", $idUtilisateur, \PDO::PARAM_INT);
+        
+        $req->execute();
+        
+        $uneLigne = $req->fetch(\PDO::FETCH_OBJ);
+        
+        $lesTraces = array();
+        while($uneLigne) {
+            $unIdTrace = $uneLigne->id;
+            $uneDateHeureDebut = mb_convert_encoding($uneLigne->dateDebut,  "UTF-8");
+            if ($uneLigne->dateFin != NULL) {
+                $uneDateHeureFin = mb_convert_encoding($uneLigne->dateFin, "UTF-8");
+            }
+            else {
+                $uneDateHeureFin = NULL;
+            }
+            $terminee = mb_convert_encoding($uneLigne->terminee,  "UTF-8");
+            $unIdUtilisateur= mb_convert_encoding($uneLigne->idUtilisateur, "UTF-8");
+            
+            $uneTrace = new Trace($unIdTrace, $uneDateHeureDebut, $uneDateHeureFin, $terminee, $unIdUtilisateur);
+            $uneTrace->setLesPointsDeTrace($this->getLesPointsDeTrace($unIdTrace));
+            //constructeur de la classe Trace
+            $lesTraces[] = $uneTrace;
+            // extrait la ligne suivante
+            $uneLigne = $req->fetch(\PDO::FETCH_OBJ);
+        }
+        
+        $req->CloseCursor();
+        
+        return $lesTraces;
+    }
+    
+    //     // préparation de la requête de recherche
+    //     $txt_req = "Select id, pseudo, mdpSha1, adrMail, numTel, niveau, dateCreation, nbTraces, dateDerniereTrace";
+    //     $txt_req .= " from tracegps_vue_utilisateurs";
+    //     $txt_req .= " where niveau = 1";
+    //     $txt_req .= " order by pseudo";
+    
+    //     $req = $this->cnx->prepare($txt_req);
+    //     // extraction des données
+    //     $req->execute();
+    //     $uneLigne = $req->fetch(\PDO::FETCH_OBJ);
+    
+    //     // construction d'une collection d'objets Utilisateur
+    //     $lesUtilisateurs = array();
+    //     // tant qu'une ligne est trouvée :
+    //     while ($uneLigne) {
+    //         // création d'un objet Utilisateur
+    //         $unId = mb_convert_encoding($uneLigne->id, "UTF-8");
+    //         $unPseudo = mb_convert_encoding($uneLigne->pseudo, "UTF-8");
+    //         $unMdpSha1 = mb_convert_encoding($uneLigne->mdpSha1, "UTF-8");
+    //         $uneAdrMail = mb_convert_encoding($uneLigne->adrMail, "UTF-8");
+    //         $unNumTel = mb_convert_encoding($uneLigne->numTel, "UTF-8");
+    //         $unNiveau = mb_convert_encoding($uneLigne->niveau, "UTF-8");
+    //         $uneDateCreation = mb_convert_encoding($uneLigne->dateCreation, "UTF-8");
+    //         $unNbTraces = mb_convert_encoding($uneLigne->nbTraces, "UTF-8");
+    //         if (isset($uneLigne->dateDerniereTrace)) {
+    //             $uneDateDerniereTrace = mb_convert_encoding($uneLigne->dateDerniereTrace, "UTF-8");
+    //         } else {
+    //             $uneDateDerniereTrace ="";
+    //         }
+        
+    public function creerUneTrace($uneTrace){
+        // on vérifie si la trace existe déjà
+        //if ($this->existePseudoUtilisateur($unUtilisateur->getPseudo())) return false;
+        
+        $txt_req = "INSERT INTO tracegps_traces (dateDebut, dateFin, terminee, idUtilisateur) ";
+        $txt_req .= "VALUES (:dateDebut, :dateFin, :terminee, :idUtilisateur) ";
+        
+        $req = $this->cnx->prepare($txt_req);
+        
+        $req->bindValue("dateDebut", mb_convert_encoding($uneTrace->getDateHeureDebut(), "ISO-8859-1"), \PDO::PARAM_STR);
+        
+        if ($uneTrace->getDateHeureFin() != NULL) {
+            $req->bindValue("dateFin", mb_convert_encoding($uneTrace->getDateHeureFin(), "ISO-8859-1"), \PDO::PARAM_STR);
+        }
+        
+        else {
+            $req->bindValue("dateFin", $uneTrace->getDateHeureFin(), \PDO::PARAM_STR);
+        }
+        $req->bindValue("terminee", mb_convert_encoding($uneTrace->getTerminee(), "ISO-8859-1"), \PDO::PARAM_INT);
+        $req->bindValue("idUtilisateur", mb_convert_encoding($uneTrace->getIdUtilisateur(), "ISO-8859-1"), \PDO::PARAM_INT);
+        
+        // exécution de la requête
+        $ok = $req->execute();
+        
+        // sortir en cas d'échec
+        if ( ! $ok) { return false; }
+        
+        // recherche de l'identifiant (auto_increment) qui a été attribué à la trace
+        $unId = $this->cnx->lastInsertId();
+        $uneTrace->setId($unId);
+        return true;
         
     }
     

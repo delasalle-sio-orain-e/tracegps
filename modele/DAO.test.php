@@ -278,6 +278,71 @@ else {
 
 
 
+
+// **-- Test de la méthode getLesUtilisateursAutorisant --** \\
+// modifié par Singuila MBAYE-AMADOU le Mardi 14 Novembre 2023
+echo "<h3>Test de getLesUtilisateursAutorisant(idUtilisateur) : </h3>";
+$lesUtilisateurs = $dao->getLesUtilisateursAutorisant(4);
+$nbReponses = sizeof($lesUtilisateurs);
+echo "<p>Nombre d'utilisateurs autorisant l'utilisateur 4 à voir leur parcours :" . $nbReponses . "</p>";
+//affichage des utilisateurs
+foreach ($lesUtilisateurs as $unUtilisateur) {
+    echo ($unUtilisateur->toString());
+    echo ('<br>');
+}
+
+
+
+// **-- Test de la méthode supprimerUneAutorisation --** \\
+// *- modifié par Singuila MBAYE-AMADOU le Vendredi 17 Novembre 2023 -* \\
+echo "<h3>Test de supprimerUneAutorisation : </h3>";
+// on crée une autorisation
+//if ($dao->créerUneAutorisation(2,1)) $ok = "oui"; else $ok = "non";
+//echo "<p>La création de l'autorisation de l'utilisateur 2 vers l'utilisateur 1 a réussi : <b>" . $ok . "</b><br>";
+
+// puis on la supprime
+if ($dao->supprimerUneAutorisation(2, 1)) $ok = "oui"; else $ok = "non";
+echo "<p>La suppression de l'autorisation de l'utilisateur 2 vers l'utilisateur 1 a réussi : <b>" . $ok . "</b><br>";
+
+
+
+// test de la méthode getLesTraces($idUtilisateur) ------------------------------------------------
+// modifié par Singuila MBAYE le 21/11/2023
+echo "<h3>Test de getLesTraces(idUtilisateur) : </h3>";
+$lesTraces = $dao->getLesTraces(2);
+$nbReponses = sizeof($lesTraces);
+echo "<p>Nombre de traces de l'utilisateur 2 : " . $nbReponses . "</p>";
+// affichage des traces
+foreach ($lesTraces as $uneTrace)
+{ echo ($uneTrace->toString());
+echo ('<br>');
+}
+
+
+// test de la méthode creerUneTrace ----------------------------------------------------------
+// modifié par Singuila MBAYE-AMADOU le 24/11/2023
+echo "<h3>Test de creerUneTrace : </h3>";
+$trace1 = new Trace(0, "2017-12-18 14:00:00", "2017-12-18 14:10:00", true, 3);
+$ok = $dao->creerUneTrace($trace1);
+if ($ok) {
+    echo "<p>Trace bien enregistrée !</p>";
+    echo $trace1->toString();
+}
+else {
+    echo "<p>Echec lors de l'enregistrement de la trace !</p>";
+}
+$trace2 = new Trace(0, date('Y-m-d H:i:s', time()), null, false, 3);
+$ok = $dao->creerUneTrace($trace2);
+if ($ok) {
+    echo "<p>Trace bien enregistrée !</p>";
+    echo $trace2->toString();
+}
+else {
+    echo "<p>Echec lors de l'enregistrement de la trace !</p>";
+}
+
+
+
 // ferme la connexion Ã  MySQL :
 unset($dao);
 ?>
