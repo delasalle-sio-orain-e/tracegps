@@ -746,10 +746,10 @@ class DAO
     
     
     
-    public  function getUneTrace($idTrace)
+    public function getUneTrace($idTrace)
     {
         // préparation de la requête de recherche
-        $txt_req = "Select * from tracegps_traces where id=:id";
+        $txt_req = "SELECT id, dateDebut, dateFin, terminee, idUtilisateur FROM tracegps_traces WHERE id=:id";
         $req = $this->cnx->prepare($txt_req);
         // liaison de la requête et de ses paramètres
         $req->bindValue("id", $idTrace, \PDO::PARAM_INT);
@@ -757,30 +757,29 @@ class DAO
         $req->execute();
         $laTrace = $req->fetch(\PDO::FETCH_OBJ);
         // traitement de la réponse
-        if($laTrace->dateFin != null)
-        {
-            $uneDateHeureFin = mb_convert_encoding($laTrace->dateFin, "UTF-8");
+        if (!$laTrace) {
+            return null;
+        } else {
+            $unId = mb_convert_encoding($laTrace->id, "UTF-8");
+            $uneDateDebut = mb_convert_encoding($laTrace->dateDebut, "UTF-8");
+            $uneDateFin = $laTrace->dateFin; // corrected case of dateFin
+            $unIdUtilisateur = mb_convert_encoding($laTrace->idUtilisateur, "UTF-8");
+            $terminee = mb_convert_encoding($laTrace->terminee, "UTF-8");
+            
+            $newTrace = new Trace($unId, $uneDateDebut, $uneDateFin, $terminee, $unIdUtilisateur);
+            
+            // Call getLesPointsDeTrace with the trace ID
+            $LesPointsDeTrace = $this->getLesPointsDeTrace($unId);
+            
+            foreach ($LesPointsDeTrace as $points) {
+                // Assuming $points is an object with a method getLesPointsDeTrace
+                $newTrace->ajouterPoint($points);
+                // Do something with $newTracePoints, maybe add them to $newTrace
+                // ...
+            }
+            
+            return $newTrace;
         }
-        else {
-            $uneDateHeureFin = NULL;
-        }
-        
-        
-        $terminee = mb_convert_encoding($laTrace->terminee, "UTF-8");
-        
-        $unIdUtilisateur = mb_convert_encoding($laTrace->idUtilisateur, "UTF-8");
-        
-        $unId = mb_convert_encoding($laTrace->id, "UTF-8");
-        
-        $uneDateHeureDebut = mb_convert_encoding($laTrace->dateDebut, "UTF-8");
-        
-        
-        $newTrace = new Trace($unId, $uneDateHeureDebut, $uneDateHeureFin, $terminee, $unIdUtilisateur);
-        
-        $newTrace ->setLesPointsDeTrace($this->getLesPointsDeTrace($unId));
-        
-        return $newTrace;
-        
     }
     
     
