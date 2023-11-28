@@ -373,48 +373,6 @@ class DAO
         return $ok;
     }
     
-    
-    // supprime l'utilisateur $pseudo dans la bdd, ainsi que ses traces et ses autorisations
-    // fournit true si l'effacement s'est bien effectué, false sinon
-    // modifié par dP le 9/1/2018
-    public function supprimerUnUtilisateur($pseudo) {
-        $unUtilisateur = $this->getUnUtilisateur($pseudo);
-        if ($unUtilisateur == null) {
-            return false;
-        }
-        else {
-            $idUtilisateur = $unUtilisateur->getId();
-            
-            // suppression des traces de l'utilisateur (et des points correspondants)
-            $lesTraces = $this->getLesTraces($idUtilisateur);
-            if($lesTraces != null)
-            {
-                foreach ($lesTraces as $uneTrace) {
-                    $this->supprimerUneTrace($uneTrace->getId());
-                }
-            }
-            // préparation de la requête de suppression des autorisations
-            $txt_req1 = "delete from tracegps_autorisations" ;
-            $txt_req1 .= " where idAutorisant = :idUtilisateur or idAutorise = :idUtilisateur";
-            $req1 = $this->cnx->prepare($txt_req1);
-            // liaison de la requête et de ses paramètres
-            $req1->bindValue("idUtilisateur", mb_convert_encoding($idUtilisateur, "ISO-8859-1"), \PDO::PARAM_INT);
-            // exécution de la requête
-            $ok = $req1->execute();
-            
-            // préparation de la requête de suppression de l'utilisateur
-            $txt_req2 = "delete from tracegps_utilisateurs" ;
-            $txt_req2 .= " where pseudo = :pseudo";
-            $req2 = $this->cnx->prepare($txt_req2);
-            // liaison de la requête et de ses paramètres
-            $req2->bindValue("pseudo", mb_convert_encoding($pseudo, "ISO-8859-1"), \PDO::PARAM_STR);
-            // exécution de la requête
-            $ok = $req2->execute();
-            return $ok;
-        }
-    }
-    
-    
     // envoie un mail à l'utilisateur $pseudo avec son nouveau mot de passe $nouveauMdp
     // retourne true si envoi correct, false en cas de problème d'envoi
     // modifié par dP le 9/1/2018
@@ -807,6 +765,32 @@ class DAO
         return $ok;
     }
     
+    public function supprimerUneTrace($idTrace) {
+        // préparation de la requête de supression
+        $txt_req = "DELETE from tracegps_points  WHERE idTrace = :idTrace";
+        $req = $this->cnx->prepare($txt_req);
+        // liaison de la requête et de ses paramètres
+        $req->bindValue("idTrace", $idTrace, \PDO::PARAM_INT);
+        // exécution de la requête
+        $req->execute();
+        // préparation de la requête de supression
+        $txt_req2 = "DELETE from tracegps_traces  WHERE id = :idTrace";
+        $req2 = $this->cnx->prepare($txt_req2);
+        $req2->bindValue("idTrace", $idTrace, \PDO::PARAM_INT);
+        // exécution de la requête
+        $req2->execute();
+        // vérification du résultat
+        $ok = $req2->rowCount();
+        // libère les ressources du jeu de données
+        $req->closeCursor();
+        
+        if ($ok > 0) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    } 
+    
     public function creerUnPointDeTrace (PointDeTrace $unPointDeTrace) {
         
         $txt_req = "INSERT INTO tracegps_points VALUES (:idTrace, :id, :latitude, :longitude, :altitude, :dateHeure, :rythmeCardio)";
@@ -839,713 +823,47 @@ class DAO
         return true;
     }
     
-    public function supprimerUneTrace($idTrace) {
-        // préparation de la requête de supression
-        $txt_req = "DELETE from tracegps_points  WHERE idTrace = :idTrace";
-        $req = $this->cnx->prepare($txt_req);
-        // liaison de la requête et de ses paramètres
-        $req->bindValue("idTrace", $idTrace, \PDO::PARAM_INT);
-        // exécution de la requête
-        $req->execute();
-        // préparation de la requête de supression
-        $txt_req2 = "DELETE from tracegps_traces  WHERE id = :idTrace";
-        $req2 = $this->cnx->prepare($txt_req2);
-        $req2->bindValue("idTrace", $idTrace, \PDO::PARAM_INT);
-        // exécution de la requête
-        $req2->execute();
-        // vérification du résultat
-        $ok = $req2->rowCount();
-        // libère les ressources du jeu de données
-        $req->closeCursor();
-        
-        if ($ok > 0) {
-            return TRUE;
-        } else {
-            return FALSE;
+    // supprime l'utilisateur $pseudo dans la bdd, ainsi que ses traces et ses autorisations
+    // fournit true si l'effacement s'est bien effectué, false sinon
+    // modifié par dP le 9/1/2018
+    public function supprimerUnUtilisateur($pseudo) {
+        $unUtilisateur = $this->getUnUtilisateur($pseudo);
+        if ($unUtilisateur == null) {
+            return false;
+        }
+        else {
+            $idUtilisateur = $unUtilisateur->getId();
+            
+            // suppression des traces de l'utilisateur (et des points correspondants)
+            $lesTraces = $this->getLesTraces($idUtilisateur);
+            if($lesTraces != null)
+            {
+                foreach ($lesTraces as $uneTrace) {
+                    $this->supprimerUneTrace($uneTrace->getId());
+                }
+            }
+            // préparation de la requête de suppression des autorisations
+            $txt_req1 = "delete from tracegps_autorisations" ;
+            $txt_req1 .= " where idAutorisant = :idUtilisateur or idAutorise = :idUtilisateur";
+            $req1 = $this->cnx->prepare($txt_req1);
+            // liaison de la requête et de ses paramètres
+            $req1->bindValue("idUtilisateur", mb_convert_encoding($idUtilisateur, "ISO-8859-1"), \PDO::PARAM_INT);
+            // exécution de la requête
+            $ok = $req1->execute();
+            
+            // préparation de la requête de suppression de l'utilisateur
+            $txt_req2 = "delete from tracegps_utilisateurs" ;
+            $txt_req2 .= " where pseudo = :pseudo";
+            $req2 = $this->cnx->prepare($txt_req2);
+            // liaison de la requête et de ses paramètres
+            $req2->bindValue("pseudo", mb_convert_encoding($pseudo, "ISO-8859-1"), \PDO::PARAM_STR);
+            // exécution de la requête
+            $ok = $req2->execute();
+            return $ok;
         }
     }
     
-    
-    // --------------------------------------------------------------------------------------
-    // début de la zone attribuée au développeur 1 (xxxxxxxxxxxxxxxxxxxx) : lignes 350 à 549
-    // --------------------------------------------------------------------------------------
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    // --------------------------------------------------------------------------------------
-    // début de la zone attribuée au développeur 2 (xxxxxxxxxxxxxxxxxxxx) : lignes 550 à 749
-    // --------------------------------------------------------------------------------------
-    
-
-    
-    
-    
-    
-    
-    
-    
-
-    
-
-    
-    
-    
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-
-    
-    //     // préparation de la requête de recherche
-    //     $txt_req = "Select id, pseudo, mdpSha1, adrMail, numTel, niveau, dateCreation, nbTraces, dateDerniereTrace";
-    //     $txt_req .= " from tracegps_vue_utilisateurs";
-    //     $txt_req .= " where niveau = 1";
-    //     $txt_req .= " order by pseudo";
-    
-    //     $req = $this->cnx->prepare($txt_req);
-    //     // extraction des données
-    //     $req->execute();
-    //     $uneLigne = $req->fetch(\PDO::FETCH_OBJ);
-    
-    //     // construction d'une collection d'objets Utilisateur
-    //     $lesUtilisateurs = array();
-    //     // tant qu'une ligne est trouvée :
-    //     while ($uneLigne) {
-    //         // création d'un objet Utilisateur
-    //         $unId = mb_convert_encoding($uneLigne->id, "UTF-8");
-    //         $unPseudo = mb_convert_encoding($uneLigne->pseudo, "UTF-8");
-    //         $unMdpSha1 = mb_convert_encoding($uneLigne->mdpSha1, "UTF-8");
-    //         $uneAdrMail = mb_convert_encoding($uneLigne->adrMail, "UTF-8");
-    //         $unNumTel = mb_convert_encoding($uneLigne->numTel, "UTF-8");
-    //         $unNiveau = mb_convert_encoding($uneLigne->niveau, "UTF-8");
-    //         $uneDateCreation = mb_convert_encoding($uneLigne->dateCreation, "UTF-8");
-    //         $unNbTraces = mb_convert_encoding($uneLigne->nbTraces, "UTF-8");
-    //         if (isset($uneLigne->dateDerniereTrace)) {
-    //             $uneDateDerniereTrace = mb_convert_encoding($uneLigne->dateDerniereTrace, "UTF-8");
-    //         } else {
-    //             $uneDateDerniereTrace ="";
-    //         }
-        
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    // --------------------------------------------------------------------------------------
-    // début de la zone attribuée au développeur 3 (xxxxxxxxxxxxxxxxxxxx) : lignes 750 à 949
-    // --------------------------------------------------------------------------------------
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-   
-    // --------------------------------------------------------------------------------------
-    // début de la zone attribuée au développeur 4 (xxxxxxxxxxxxxxxxxxxx) : lignes 950 à 1150
-    // --------------------------------------------------------------------------------------
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-    
+ 
 } // fin de la classe DAO
 
 // ATTENTION : on ne met pas de balise de fin de script pour ne pas prendre le risque
