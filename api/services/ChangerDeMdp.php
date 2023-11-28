@@ -1,4 +1,6 @@
 <?php
+
+namespace api\services;
 // Projet TraceGPS - services web
 // fichier :  api/services/ChangerDeMdp.php
 // Dernière mise à jour : 3/7/2021 par dP

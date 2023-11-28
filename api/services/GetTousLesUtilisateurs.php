@@ -1,4 +1,6 @@
 <?php
+
+namespace api\services;
 // Projet TraceGPS - services web
 // fichier : api/services/GetTousLesUtilisateurs.php
 // Dernière mise à jour : 3/7/2021 par dP
@@ -13,7 +15,11 @@
 // Les paramètres doivent être passés par la méthode GET :
 //     http://<hébergeur>/tracegps/api/GetTousLesUtilisateurs?pseudo=callisto&mdp=13e3668bbee30b004380052b086457b014504b3e&lang=xml
 
+use DOMDocument;
+use modele\Outils;
+
 // connexion du serveur web à la base MySQL
+use modele\DAO;
 $dao = new DAO();
 	
 // Récupération des données transmises
