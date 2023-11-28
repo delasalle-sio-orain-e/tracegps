@@ -18,6 +18,7 @@ namespace api\services;
 //     http://<hébergeur>/tracegps/api/ChangerDeMdppseudo=europa&mdp=13e3668bbee30b004380052b086457b014504b3e&nouveauMdp=123&confirmationMdp=123&lang=xml
 
 // connexion du serveur web à la base MySQL
+use modele\DAO;
 $dao = new DAO();
 	
 // Récupération des données transmises
