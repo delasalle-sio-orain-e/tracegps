@@ -116,19 +116,17 @@ class rest {
 	
 	// Cette méthode nettoie les données envoyées avec la requête
 	protected function remettreEnFormeLesEntrees($data) {
-		$lesEntrees = array();
-		if (is_array($data)) {
-			foreach ($data as $cle => $valeur){
-				$lesEntrees[$cle] = $this->remettreEnFormeLesEntrees($valeur);
-			}
-		} else {
-			if (get_magic_quotes_gpc()) {
-				$data = trim(stripslashes($data));
-			}
-			$data = strip_tags($data);
-			$lesEntrees = trim($data);
-		}
-		return $lesEntrees;
+	    $lesEntrees = array();
+	    if (is_array($data)) {
+	        foreach ($data as $cle => $valeur){
+	            $lesEntrees[$cle] = $this->remettreEnFormeLesEntrees($valeur);
+	        }
+	    } else {
+	        
+	        $data = strip_tags($data);
+	        $lesEntrees = trim($data);
+	    }
+	    return $lesEntrees;
 	}
 } // fin de la classe Rest
 ?>
