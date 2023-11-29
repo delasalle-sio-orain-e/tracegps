@@ -129,6 +129,7 @@ class DAO
         // libère les ressources du jeu de données
         $req->closeCursor();
         
+        
         // fourniture de la réponse
         if ($nbReponses == 0) {
             return false;
