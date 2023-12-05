@@ -23,7 +23,7 @@ if ($lang != "json") $lang = "xml";
 // La méthode HTTP utilisée doit être GET
 if ($this->getMethodeRequete() != "GET")
 {	$msg = "Erreur : méthode HTTP incorrecte.";
-    $code_reponse = 406;
+$code_reponse = 406;
 }
 else{
     // Les paramètres doivent être présents
@@ -37,7 +37,7 @@ else{
         $niveauConnexion = $dao->getNiveauConnexion($pseudo, $mdp);
         
         if ( $niveauConnexion == 0 )
-        {  
+        {
             $msg = "Erreur : authentification incorrecte.";
             $code_reponse = 401;
         }
@@ -47,7 +47,7 @@ else{
             $pseudoDestExiste = $dao->existePseudoUtilisateur($pseudoDestinataire);
             
             if ( $pseudoDestExiste == false )
-            {   
+            {
                 $msg = "Erreur : pseudo utilisateur inexistant.";
                 $code_reponse = 401;
             }
@@ -140,10 +140,10 @@ function creerFluxXML($msg)
 // création du flux JSON en sortie
 function creerFluxJSON($msg)
 {
-
-     // construction de l'élément "data"
-     $elt_data = ["reponse" => $msg];
-
+    
+    // construction de l'élément "data"
+    $elt_data = ["reponse" => $msg];
+    
     
     // construction de la racine
     $elt_racine = ["data" => $elt_data];
