@@ -796,13 +796,13 @@ class DAO
         $txt_req = "INSERT INTO tracegps_points VALUES (:idTrace, :id, :latitude, :longitude, :altitude, :dateHeure, :rythmeCardio)";
         $req = $this->cnx->prepare($txt_req);
         // liaison de la requête et de ses paramètres
-        $req->bindValue("idTrace", mb_convert_encoding($unPointDeTrace->getIdTrace(), "ISO-8859-1"), \PDO::PARAM_INT);
-        $req->bindValue("id", mb_convert_encoding($unPointDeTrace->getId(), "ISO-8859-1"), \PDO::PARAM_INT);
-        $req->bindValue("latitude", mb_convert_encoding($unPointDeTrace->getLatitude(), "ISO-8859-1"), \PDO::PARAM_INT);
-        $req->bindValue("longitude", mb_convert_encoding($unPointDeTrace->getLongitude(), "ISO-8859-1"), \PDO::PARAM_INT);
-        $req->bindValue("altitude", mb_convert_encoding($unPointDeTrace->getAltitude(), "ISO-8859-1"), \PDO::PARAM_INT);
+        $req->bindValue("idTrace", $unPointDeTrace->getIdTrace(), \PDO::PARAM_INT);
+        $req->bindValue("id", $unPointDeTrace->getId(), \PDO::PARAM_INT);
+        $req->bindValue("latitude", $unPointDeTrace->getLatitude(), \PDO::PARAM_STR);
+        $req->bindValue("longitude", $unPointDeTrace->getLongitude(), \PDO::PARAM_STR);
+        $req->bindValue("altitude", $unPointDeTrace->getAltitude(), \PDO::PARAM_INT);
         $req->bindValue("dateHeure", mb_convert_encoding($unPointDeTrace->getDateHeure(), "ISO-8859-1"), \PDO::PARAM_STR);
-        $req->bindValue("rythmeCardio", mb_convert_encoding($unPointDeTrace->getRythmeCardio(), "ISO-8859-1"), \PDO::PARAM_INT);
+        $req->bindValue("rythmeCardio", $unPointDeTrace->getRythmeCardio(), \PDO::PARAM_INT);
         
         // extraction des données
         $req->execute();
