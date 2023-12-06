@@ -52,6 +52,7 @@ $distanceCumulee =0;
 $vitesse = 0;
 
 $idPoint = null;
+$uneTrace = null;
 
 // "xml" par défaut si le paramètre lang est absent ou incorrect
 if ($lang != "json") $lang = "xml";
@@ -164,11 +165,11 @@ unset($dao);
 // création du flux en sortie
 if ($lang == "xml") {
     $content_type = "application/xml; charset=utf-8";      // indique le format XML pour la réponse
-    $donnees = creerFluxXML($msg);
+    $donnees = creerFluxXML($msg, $uneTrace);
 }
 else {
     $content_type = "application/json; charset=utf-8";      // indique le format Json pour la réponse
-    $donnees = creerFluxJSON($msg);
+    $donnees = creerFluxJSON($msg, $uneTrace);
 }
 
 $this->envoyerReponse($code_reponse, $content_type, $donnees);
@@ -177,7 +178,7 @@ exit;
 
 // *--------*
 
-function creerFluxXML($msg)
+function creerFluxXML($msg, $uneTrace)
 {
     /* Exemple de code XML
      <?xml version="1.0" encoding="UTF-8"?>
@@ -186,6 +187,7 @@ function creerFluxXML($msg)
      <reponse>Erreur : authentification incorrecte.</reponse>
      </data>
      */
+    
     
     // crée une instance de DOMdocument (DOM : Document Object Model)
     $doc = new DOMDocument();
@@ -207,6 +209,15 @@ function creerFluxXML($msg)
     $elt_reponse = $doc->createElement('reponse', $msg);
     $elt_data->appendChild($elt_reponse);
     
+    $elt_donnees = $doc->createElement('donnees');
+    $elt_data->appendChild($elt_donnees);
+    if($uneTrace)
+    {
+        $id = $uneTrace->getNombrePoints()+1;
+        $elt_id = $doc->createElement('id', $id);
+        $elt_donnees->appendChild($elt_id);
+    }
+   
     // Mise en forme finale
     $doc->formatOutput = true;
     
@@ -214,25 +225,24 @@ function creerFluxXML($msg)
     return $doc->saveXML();
 }
 
-function creerFluxJson($msg)
+function creerFluxJson($msg, $uneTrace)
 {
-    /*
-     * {
- "data": {
- "reponse": "............. (message retourné par le service web) ...............",
- "donnees": [ ]
- }
- }
-}
-
-     */
-    
     $elt_data = ["reponse" => $msg];
-
+    
+    if ($uneTrace) {
+        $idTrace = $uneTrace->getNombrePoints() + 1;
+        
+        $elt_donnees = ["id" => $idTrace];
+    } else {
+        $elt_donnees = [];
+    }
+    
     // construction de la racine
-    $elt_racine = ["data" => $elt_data];
+    $elt_racine = ["data" => ["reponse" => $msg, "donnees" => $elt_donnees]];
+    
     // retourne le contenu JSON (l'option JSON_PRETTY_PRINT gère les sauts de ligne et l'indentation)
     return json_encode($elt_racine, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 }
+
 
 ?>
