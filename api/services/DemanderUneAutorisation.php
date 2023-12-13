@@ -58,7 +58,7 @@ else{
                 // envoi d'un mail d'acceptation à l'intéressé
                 $sujetMail = "Votre demande d'autorisation à un utilisateur du système TraceGPS";
                 $contenuMail = "Cher ou chère " . $pseudoDestinataire . "\n\n";
-                $contenuMail = "Un utilisateur de TraceGPS cous demande l'authorisation de suivre votre parcourt \n\n";
+                $contenuMail = "Un utilisateur de TraceGPS cous demande l'autorisation de suivre votre parcourt \n\n";
                 $contenuMail = "Voici les information le concernant  \n\n";
                 $contenuMail .= "Son pseudo : " . $pseudo . " \n\n";
                 $contenuMail .= "Son adresse mail : " . $adrMailEmetteur . " \n\n";
@@ -76,11 +76,11 @@ else{
                     $code_reponse = 500;
                 }
                 else {
-                    $msg = "Autorisation enregistrée.<br>Le demandeur va recevoir un courriel de confirmation.";
+                    $msg = $pseudo . " va recevoir un courriel avec votre demande";
                     $code_reponse = 200;
                 }
             }
-        }
+        } 
     }
 }
 // ferme la connexion à MySQL :

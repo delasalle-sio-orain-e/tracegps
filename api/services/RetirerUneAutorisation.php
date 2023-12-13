@@ -80,7 +80,7 @@ else {
                 }
                 if(!$bool){
                     
-                    $msg = "Erreur :  l'autorisation n'était pas accordée.";
+                    $msg = "Erreur : l'autorisation n'était pas accordée.";
                     $code_reponse = 400;
                     
                 }else{
