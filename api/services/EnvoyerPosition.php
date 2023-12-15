@@ -46,13 +46,7 @@ $altitude = ( empty($this->request['altitude'])) ? "" : $this->request['altitude
 $rythmeCardio = ( empty($this->request['rythmeCardio'])) ? "" : $this->request['rythmeCardio'];
 $lang = ( empty($this->request['lang'])) ? "" : $this->request['lang'];
 
-//$unUtilisateur = $dao->getUnUtilisateur($pseudo);
-$tempsCumule = 0;
-$distanceCumulee =0;
-$vitesse = 0;
-
-$idPoint = null;
-$uneTrace = null;
+$unPoint = null;
 
 // "xml" par défaut si le paramètre lang est absent ou incorrect
 if ($lang != "json") $lang = "xml";
@@ -82,26 +76,17 @@ else {
             $code_reponse = 401; 
         }
         else
-        {         
-            if ($dao->getUneTrace($idTrace) == null)
+        {   $laTrace = $dao->getUneTrace($idTrace);      
+            if ($laTrace == null)
             {
                 $msg = "Erreur : le numéro de trace n'existe pas.";
                 $code_reponse = 405;
                 
             }
             else {
-                $unUtilisateur = $dao->getUnUtilisateur($pseudo);
-                $idUtilisateur = $unUtilisateur->getId();
-                $lesTraces = $dao->getLesTraces($idUtilisateur);
-                $ok=false;
-                
-                foreach ($lesTraces as $uneTrace){
+                $idUtilisateur = $dao->getUnUtilisateur($pseudo)->getId();
+                if ($idUtilisateur != $laTrace->getIdUtilisateur()) {
                     
-                    if ($uneTrace->getId() == $idTrace){
-                        $ok = true;
-                    }
-                }
-                if (!$ok) {
                     $msg = "Erreur : le numéro de trace ne correspond pas à cet utilisateur.";
                     $code_reponse = 405;
                     
@@ -118,43 +103,40 @@ else {
                     }
                     else
                     {
-                        $idNewPoint = $uneTrace->getNombrePoints();
-                        $idNewPoint ++;
-                        $point = new PointDeTrace($idTrace, $idNewPoint, $latitude, $longitude, $altitude, $dateHeure, $rythmeCardio, $tempsCumule, $distanceCumulee, $vitesse);
-                        $ok = $dao->creerUnPointDeTrace($point);
-                        
-                        if (!$ok)
-                        {
-                            $msg = "Erreur : problème lors de l'enregistrement du point.";
-                            $code_reponse = 405;
-                            
+                        $dernierPoint = null;
+                        if ($laTrace->getNombrePoints() > 0) {
+                            $dernierPoint = $laTrace->getLesPointsDeTrace() [$laTrace->getNombrePoints() - 1];
                         }
-                        else {
-                            $msg = "Point cree";
+                        
+                        if ($dernierPoint != null && $dernierPoint->getDateHeure() == $dateHeure){
+                            $unPoint = $dernierPoint;
+                            $msg = "Point déjà créé.";
                             $code_reponse = 200;
+                        }
+                        
+                        else {
+                            $idPoint = $laTrace->getNombrePoints() + 1;
+                            $tempsCumule = 0;
+                            $distanceCumulee = 0;
+                            $vitesse = 0;
+                            $unPoint = new PointDeTrace($idTrace, $idPoint, $latitude, $longitude, $altitude, $dateHeure, $rythmeCardio, $tempsCumule, $distanceCumulee, $vitesse);
+                            $ok = $dao->creerUnPointDeTrace($unPoint);
+                        
+                            if (!$ok)
+                            {
+                                $msg = "Erreur : problème lors de l'enregistrement du point.";
+                                $code_reponse = 405;
+                                
+                            }
+                            else {
+                                $msg = "Point créé.";
+                                $code_reponse = 200;
+                            }
                         }
                         
                     }
                 }
             }
-            
-            
-            
-            //$idUtilisateur = $dao->getUnUtilisateur($pseudo)->getId();
-            // récupération des utilisateurs autorisant via la méthode getLesUtilisateursAutorisés de la classe DAO
-            //$lesUtilisateurs = $dao->getLesUtilisateursAutorises($idUtilisateur);
-            // mémorisation du nombre d'utilisateurs
-            //$nbReponses = sizeof($lesUtilisateurs);
-            //if ($nbReponses == 0)
-            //{
-            //    $msg = "Aucune autorisation accordée à " . $pseudo . ".";
-            //    $code_reponse = 200;
-            //}
-            //else
-            //{
-            //    $msg = $nbReponses . " autorisation(s) accordée(s) à " . $pseudo . ".";
-            //    $code_reponse = 200;
-            //}
         }
     }
 }
@@ -165,11 +147,11 @@ unset($dao);
 // création du flux en sortie
 if ($lang == "xml") {
     $content_type = "application/xml; charset=utf-8";      // indique le format XML pour la réponse
-    $donnees = creerFluxXML($msg, $uneTrace);
+    $donnees = creerFluxXML($msg, $unPoint);
 }
 else {
     $content_type = "application/json; charset=utf-8";      // indique le format Json pour la réponse
-    $donnees = creerFluxJSON($msg, $uneTrace);
+    $donnees = creerFluxJSON($msg, $unPoint);
 }
 
 $this->envoyerReponse($code_reponse, $content_type, $donnees);
@@ -211,12 +193,14 @@ function creerFluxXML($msg, $uneTrace)
     
     $elt_donnees = $doc->createElement('donnees');
     $elt_data->appendChild($elt_donnees);
-    if($uneTrace)
+    
+    if($uneTrace != null)
     {
-        $id = $uneTrace->getNombrePoints()+1;
-        $elt_id = $doc->createElement('id', $id);
-        $elt_donnees->appendChild($elt_id);
+        $elt_id = $doc->createElement('id', $uneTrace->getId());
+        $elt_data->appendChild($elt_id);
     }
+    
+    
    
     // Mise en forme finale
     $doc->formatOutput = true;
@@ -225,20 +209,18 @@ function creerFluxXML($msg, $uneTrace)
     return $doc->saveXML();
 }
 
-function creerFluxJson($msg, $uneTrace)
-{
-    $elt_data = ["reponse" => $msg];
-    
-    if ($uneTrace) {
-        $idTrace = $uneTrace->getNombrePoints() + 1;
-        
-        $elt_donnees = ["id" => $idTrace];
+function creerFluxJson($msg, $unPoint)
+{ 
+    if ($unPoint != null) {
+        $elt_id = ["id" => $unPoint->getId()];
     } else {
-        $elt_donnees = [];
+        $elt_id = [];
     }
     
+    $elt_data = ["reponse" => $msg, "donnees" => $elt_id];
+    
     // construction de la racine
-    $elt_racine = ["data" => ["reponse" => $msg, "donnees" => $elt_donnees]];
+    $elt_racine = ["data" => $elt_data];
     
     // retourne le contenu JSON (l'option JSON_PRETTY_PRINT gère les sauts de ligne et l'indentation)
     return json_encode($elt_racine, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);

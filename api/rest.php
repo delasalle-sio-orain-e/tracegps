@@ -28,6 +28,7 @@ class rest {
 		d’erreur. Une page ayant un code réponse différent de 200 entraînera donc l’arrêt de la lecture de cette même
 		page (ce qui provoque un plantage en Java)
 		*/ 
+	    $code_reponse = 200;
 		$this->codeReponse = 200;
 		$this->contentType = $content_type;       // mémorise le le format de la réponse HTTP
         $this->preparerEntetes();                 // prépare les entêtes HTTP de la réponse HTTP

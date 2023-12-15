@@ -50,7 +50,7 @@ class api extends rest
                 $code_reponse = 404;            
                 $donnees = '';
                 $content_type = "application/json; charset=utf-8";      // indique le format Json pour la réponse
-                $this->envoyerReponse($code_reponse, $content_type, $donnees);    // envoi de la réponse HTTP
+                $this->envoyerReponse(200, $content_type, $donnees);    // envoi de la réponse HTTP
                 break;
             }  
         } 
