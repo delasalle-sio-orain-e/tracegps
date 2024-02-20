@@ -44,7 +44,13 @@ else {
     if ( $pseudo == "") {
         $msg = "Erreur : données incomplètes.";
         $code_reponse = 400;
-    }
+    }else{
+        $unUtilisateur = $dao->getUnUtilisateur($pseudo);
+        if ($unUtilisateur == null)
+        {  $msg = "Erreur : pseudo utilisateur inexistant.";
+        $code_reponse = 400;
+        }
+    
     else{   
     $consonnes = ["b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "w", "x", "y", "z"];
     $voyelles = ["a", "e", "i", "o", "u", "y"];
@@ -89,7 +95,7 @@ else {
                     }
                 }
             }
-            
+        }
     }
             
         
