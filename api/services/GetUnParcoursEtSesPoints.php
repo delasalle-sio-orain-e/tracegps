@@ -158,15 +158,11 @@ function creerFluxXML($msg, $laTrace,$lesPoint)
         $elt_donnees = $doc->createElement('donnees');
         $elt_data->appendChild($elt_donnees);
         
-        // place l'élément 'lesTraces' dans l'élément 'donnees'
-        $elt_lesTraces = $doc->createElement('LaTrace');
-        $elt_donnees->appendChild($elt_lesTraces);
-        
         
             // crée un élément vide 'trace'
             $elt_trace = $doc->createElement('trace');
             // place l'élément 'utilisateur' dans l'élément 'lesUtilisateurs'
-            $elt_lesTraces->appendChild($elt_trace);
+            $elt_donnees->appendChild($elt_trace);
             
             // crée les éléments enfants de l'élément 'utilisateur'
             $elt_id = $doc->createElement('id', $laTrace->getId());
@@ -191,28 +187,31 @@ function creerFluxXML($msg, $laTrace,$lesPoint)
             $elt_trace->appendChild($elt_idUtilisateur);
             
             
-            $elt_points = $doc->createElement('lesPoints');
-            $elt_data->appendChild($elt_points);
+            $elt_lesPoints = $doc->createElement('lesPoints');
+            $elt_donnees->appendChild($elt_lesPoints);
             
             foreach($lesPoint as $unPoint){
                 
+                $elt_point = $doc->createElement('point');
+                $elt_lesPoints->appendChild($elt_point);
+                
                 $elt_id = $doc->createElement('id', $unPoint->getId());
-                $elt_points->appendChild($elt_id);
+                $elt_point->appendChild($elt_id);
                 
                 $elt_latitude = $doc->createElement('latitude', $unPoint->getLatitude());
-                $elt_points->appendChild($elt_latitude );
+                $elt_point->appendChild($elt_latitude );
                 
                 $elt_longitude = $doc->createElement('longitude', $unPoint->getLongitude());
-                $elt_points->appendChild($elt_longitude );
+                $elt_point->appendChild($elt_longitude );
                 
                 $elt_altitude = $doc->createElement('altitude', $unPoint->getaltitude());
-                $elt_points->appendChild($elt_altitude);
+                $elt_point->appendChild($elt_altitude);
                 
                 $elt_DateHeure = $doc->createElement('dateHeure', $unPoint->getDateHeure());
-                $elt_points->appendChild($elt_DateHeure);
+                $elt_point->appendChild($elt_DateHeure);
                 
                 $elt_RythmeCardio = $doc->createElement('RythmeCardio', $unPoint->getRythmeCardio());
-                $elt_points->appendChild($elt_RythmeCardio);
+                $elt_point->appendChild($elt_RythmeCardio);
             }
             
             
@@ -229,10 +228,7 @@ function creerFluxXML($msg, $laTrace,$lesPoint)
 // création du flux JSON en sortie
 function creerFluxJSON($msg, $latrace,$lesPoint)
 {
-  
-    
-    
-    if ($latrace==0) {
+    if (!$latrace) {
         // construction de l'élément "data"
         $elt_data = ["reponse" => $msg];
     }
@@ -255,13 +251,15 @@ function creerFluxJSON($msg, $latrace,$lesPoint)
             $lesObjetsDuTableauPoint = array();
             $unObjetPoint = array();
             foreach($lesPoint as $unPoint){
-                $unObjetPoint["id"] = $unPoint->getId();
-                $unObjetPoint["latitude"] = $unPoint->getLatitude();
-                $unObjetPoint["longitude"] = $unPoint->getLongitude();      
-                $unObjetPoint["altitude"] =$unPoint->getaltitude();
-                $unObjetPoint["dateHeure"] = $unPoint->getDateHeure();
-                $unObjetPoint["RythmeCardio"] = $unPoint->getRythmeCardio();
-                $lesObjetsDuTableauPoint[] =  $unObjetPoint;
+                
+                $elt_point = [
+                    "id" => $unPoint->getId(),
+                    "latitude" => $unPoint->getLatitude(), 
+                    "longitude" => $unPoint->getLongitude(),
+                    "altitude" => $unPoint->getaltitude(),
+                    "dateHeure" => $unPoint->getDateHeure(),
+                    "RythmeCardio" => $unPoint->getRythmeCardio()];
+                $lesObjetsDuTableauPoint[] =  $elt_point;
             }
            
         // construction de l'élément "lesTraces"

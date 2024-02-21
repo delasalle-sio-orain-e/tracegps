@@ -47,7 +47,7 @@ else {
     }else{
         $unUtilisateur = $dao->getUnUtilisateur($pseudo);
         if ($unUtilisateur == null)
-        {  $msg = "Erreur : pseudo utilisateur inexistant.";
+        {  $msg = "Erreur : pseudo inexistant.";
         $code_reponse = 400;
         }
     

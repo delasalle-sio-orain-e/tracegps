@@ -193,15 +193,14 @@ class Trace
         if (sizeof($this->lesPointsDeTrace) != 0){
             
             $dernierPoint = $this->lesPointsDeTrace[count($this->lesPointsDeTrace) - 1];
-            $distanceCumuleDernierPoint = $dernierPoint->getDistanceCumulee();
-            $tempsCumuleDernierPoint = (double) ($dernierPoint->getTempsCumule());
+            $distanceEntrePoints = Point::getDistance($point,$dernierPoint);
+            $tempsCumuleDernierPoint = strtotime($point->getDateHeure()) - strtotime($dernierPoint->getDateHeure());
             
-            $datePoint = new DateTime($point->getDateHeure());
-            $dateDernierPoint = new DateTime($dernierPoint->getDateHeure());
-            
-            $temps = ($datePoint->getTimestamp() - $dateDernierPoint->getTimestamp()) + $tempsCumuleDernierPoint;
-            $distance = (double) (Point::getDistance($dernierPoint, $point)) + $distanceCumuleDernierPoint;
-            $vitesse = (Point::getDistance($dernierPoint, $point)) / (($datePoint->getTimestamp() - $dateDernierPoint->getTimestamp()) / 3600);
+            $temps = $dernierPoint->getTempsCumule() + $tempsCumuleDernierPoint;
+            $distance = (double) $dernierPoint->getDistanceCumulee() + $distanceEntrePoints;
+            $vitesse = 0;
+            if($this->getDureeEnSecondes() > 0)
+                $vitesse = $distanceEntrePoints / ($this->getDureeEnSecondes() / 3600);
         }
         
         $point->setTempsCumule($temps);
