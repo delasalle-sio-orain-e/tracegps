@@ -54,11 +54,9 @@ else {
             $msg = "Erreur : authentification incorrecte.";
             $code_reponse = 401;
         } else {
-            $id = $dao->getUneTrace($idTrace)->getId();
             
-            
-            // contrôle d'existence du parcours à supprimer
-            if ($id == null) {
+            if ($dao->getUneTrace($idTrace) == null)
+            {
                 $msg = "Erreur : parcours inexistant.";
                 $code_reponse = 400;
             } else {
