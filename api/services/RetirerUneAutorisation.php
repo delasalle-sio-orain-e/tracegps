@@ -69,8 +69,8 @@ else {
                 $code_reponse = 400;
             }
             else {
-                $idAutorisant = $utilisateurDestinataire->getId();
-                $idAutorise = $utilisateurDemandeur->getId();
+                $idAutorisant = $utilisateurDemandeur->getId();
+                $idAutorise = $utilisateurDestinataire->getId();
                 $bool= FALSE;
                 $utilisateursAutorisants = $dao->getLesUtilisateursAutorisant($utilisateurDestinataire->getId());
                 foreach($utilisateursAutorisants as $utilisateur){
@@ -109,7 +109,7 @@ else {
                                 $msg = "Erreur : autorisation supprimée ; l'envoi du courriel de notification a rencontré un problème.";
                                 $code_reponse = 500;
                             }else{
-                                $msg = "Autorisation supprimée. ;" .$pseudoARetirer. " va recevoir un courriel de notification.";
+                                $msg = "Autorisation supprimée ;" .$pseudoARetirer. " va recevoir un courriel de notification.";
                                 $code_reponse = 200;
                             }
                         }else{

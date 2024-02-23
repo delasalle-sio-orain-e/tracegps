@@ -67,12 +67,12 @@ else {
                     $msg = "Erreur : vous n'êtes pas le propriétaire de ce parcours.";
                     $code_reponse = 400;
                 } else {
-                    $ok = $dao->supprimerUneTrace($trace);
+                    $ok = $dao->supprimerUneTrace($idTrace);
                     if (!$ok) {
                         $msg = "Erreur : problème lors de la suppression de la trace";
                         $code_reponse = 400;
                     } else {
-                        $msg = " trace supprimé. ;";
+                        $msg = "Trace supprimé.";
                         $code_reponse = 200;
                     }
                 }

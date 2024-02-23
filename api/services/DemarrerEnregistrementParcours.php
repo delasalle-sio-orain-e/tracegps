@@ -70,7 +70,7 @@ else{
                 $msg = "Erreur : Trace n'est pas créée";
             }
             else{
-                $msg = "Trace créée";
+                $msg = "Trace créée.";
             }
         }
         

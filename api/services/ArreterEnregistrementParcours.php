@@ -68,7 +68,7 @@ else{
                 $idPseudo = $dao->getUnUtilisateur($pseudo)->getId();
                 if($idPseudo !=$traces)
                 {
-                    $msg = "Erreur : Le numéro de trace ne correspond pas à cet utilisateur.";
+                    $msg = "Erreur : le numéro de trace ne correspond pas à cet utilisateur.";
                     $code_reponse = 400;
                 }
                 else{
@@ -79,7 +79,7 @@ else{
                         $code_reponse = 400;
                     }
                     else{
-                        $msg = "Trace terminée.";
+                        $msg = "Enregistrement terminé.";
                         $code_reponse = 400;
                         
                          $traceTermine = $dao->terminerUneTrace($idTrace); 
