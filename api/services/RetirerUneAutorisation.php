@@ -109,7 +109,7 @@ else {
                                 $msg = "Erreur : autorisation supprimée ; l'envoi du courriel de notification a rencontré un problème.";
                                 $code_reponse = 500;
                             }else{
-                                $msg = "Autorisation supprimée ;" .$pseudoARetirer. " va recevoir un courriel de notification.";
+                                $msg = "Autorisation supprimée ; " .$pseudoARetirer. " va recevoir un courriel de notification.";
                                 $code_reponse = 200;
                             }
                         }else{
