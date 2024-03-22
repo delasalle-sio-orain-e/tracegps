@@ -1,5 +1,4 @@
 <?php
-namespace modele;
 // Projet TraceGPS
 // fichier : modele/Utilisateur.class.php
 // Rôle : la classe Utilisateur représente les utilisateurs de l'application

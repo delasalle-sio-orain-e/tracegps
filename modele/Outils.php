@@ -1,6 +1,4 @@
 <?php 
-namespace modele;
-use DOMDocument;
 // Projet TraceGPS
 // fichier : modele/Outils.class.php
 // Rôle : boite à outils de fonctions courantes proposées sous forme de méthodes statiques
@@ -297,6 +295,17 @@ class Outils
 		$EXPRESSION = "#^([0-9]{2,2}( |\.|-|_|/)?){4,4}[0-9]{2,2}$#";
 		// on retourne true si le numéro est bon, mais aussi si le numéro est vide :
 		if ( preg_match ( $EXPRESSION , $numTelAvalider) == true || $numTelAvalider == "" ) return true; else return false;
+	}
+
+	public static function estUnMdpValide ($unMdp)
+	{
+		$EXPRESSION = "#^(?=.*[a-z].*$)(?=.*[A-Z].*$)(?=.*[0-9].*$)(?=.{8,}$)#"; 
+		if (preg_match($EXPRESSION, $unMdp)) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 } // fin de la classe Outils

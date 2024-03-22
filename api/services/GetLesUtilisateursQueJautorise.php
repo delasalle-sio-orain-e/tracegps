@@ -1,6 +1,5 @@
 <?php
 
-namespace api\services;
 // Projet TraceGPS - services web
 // fichier : api/services/GetTousLesUtilisateurs.php
 // Dernière mise à jour : Mardi 28 novembre 2023 par Singuila MBAYE-AMADOU
@@ -15,11 +14,9 @@ namespace api\services;
 //  • Vérifier l'authentification de l'utilisateur
 //  • Fournir la liste des utilisateurs qu'il autorise à consulter ses parcours
 
-use DOMDocument;
-use modele\Outils;
+include_once ('../modele/Outils.php');
 
 // connexion du serveur web à la base MySQL
-use modele\DAO;
 $dao = new DAO();
 
 // Récupération des données transmises

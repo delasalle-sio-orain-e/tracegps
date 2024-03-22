@@ -1,6 +1,6 @@
 <?php
 
-namespace api;
+ ;
 // Projet TraceGPS - services web
 // Fichier : api/rest.php
 // La classe Rest est la classe mère de la classe Api (fichier api/api.php)

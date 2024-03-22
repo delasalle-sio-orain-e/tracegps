@@ -1,6 +1,4 @@
 <?php
-
-namespace api\services;
 // Projet TraceGPS - services web
 // fichier :  api/services/CreerUnUtilisateur.php
 // Dernière mise à jour : 3/7/2021 par dP
@@ -16,12 +14,10 @@ namespace api\services;
 // Les paramètres doivent être passés par la méthode GET :
 //     http://<hébergeur>/tracegps/api/CreerUnUtilisateur?pseudo=turlututu&adrMail=delasalle.sio.eleves@gmail.com&numTel=1122334455&lang=xml
 
-use DOMDocument;
-use modele\Outils;
-use modele\Utilisateur;
+include_once ('../modele/Outils.php');
+include_once ('../modele/Utilisateur.php');
 
 // connexion du serveur web à la base MySQL
-use modele\DAO;
 $dao = new DAO();
 
 // Récupération des données transmises

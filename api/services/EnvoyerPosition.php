@@ -24,13 +24,11 @@
 //• Enregistrer le point dans la base de données
 //• Retourner l'id du point
 
-use modele\Outils;
 
-// connexion du serveur web à la base MySQL
-use modele\DAO;
-use modele\PointDeTrace;
-use modele\Trace;
-use modele\Utilisateur;
+// // connexion du serveur web à la base MySQL
+// include_once ('../modele/PointDeTrace.php');
+// include_once ('../modele/Trace.php');
+// include_once ('../modele/Utilisateur.php')
 
 
 $dao = new DAO();

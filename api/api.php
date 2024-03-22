@@ -1,6 +1,6 @@
 <?php
 
-namespace api;
+ ;
 // Projet TraceGPS - services web
 // Fichier : api/api.php
 // La classe Api hérite de la classe Rest (fichier api/rest.php)

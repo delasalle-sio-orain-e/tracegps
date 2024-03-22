@@ -1,6 +1,4 @@
 <?php
-
-namespace api\services;
 // Projet TraceGPS - services web
 // fichier : api/services/Connecter.php
 // Dernière mise à jour : 3/7/2021 par dP
@@ -24,11 +22,7 @@ namespace api\services;
 // curl -i -X GET "http://sio.lyceedelasalle.fr/tracegps/api/Connecterr?pseudo=europa&mdp=13e3668bbee30b004380052b086457b014504b3e&lang=json"
 // curl -i -X GET "http://sio.lyceedelasalle.fr/tracegps/api/connecter?pseudo=europa&mdp=13e3668bbee30b004380052b086457b014504b3e&lang=json"
 
-use DOMDocument;
-use modele\Outils;
-
 // connexion du serveur web à la base MySQL
-use modele\DAO;
 $dao = new DAO();
 
 // Récupération des données transmises

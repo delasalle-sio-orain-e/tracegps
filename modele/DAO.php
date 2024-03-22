@@ -1,7 +1,4 @@
 <?php
-namespace modele;
-
-use Exception;
 // Projet TraceGPS
 // fichier : modele/DAO.class.php   (DAO : Data Access Object)
 // Rôle : fournit des méthodes d'accès à la bdd tracegps (projet TraceGPS) au moyen de l'objet \PDO

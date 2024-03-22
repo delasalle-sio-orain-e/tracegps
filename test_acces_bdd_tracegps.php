@@ -2,7 +2,7 @@
 // Projet tracegps
 // fichier : test_acces_bdd_tracegps.php
 // Rôle : test de l'accès à la base de données tracegps sur le serveur MySql en localhost
-// Dernière mise à jour : 12/7/2021 par dPlanchet
+// Dernière mise à jour : 01/11/2021 par dP
 ?>
 <!DOCTYPE html>
 <html>
@@ -24,7 +24,7 @@ try
 {	$cnx = new PDO ("mysql:host=" . $PARAM_HOTE . ";port=" . $PARAM_PORT . ";dbname=" . $PARAM_BDD,
     $PARAM_USER,
     $PARAM_PWD);
-echo ("Connexion réussie à la base de données tracegps <br>");
+    echo ("Connexion réussie à la base de données tracegps <br>");
 }
 catch (Exception $ex)
 {	echo ("Echec de la connexion à la base de données tracegps <br>");

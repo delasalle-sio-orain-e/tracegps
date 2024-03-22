@@ -1,6 +1,4 @@
 <?php
-namespace modele;
-use DateTime;
 // Projet TraceGPS
 // fichier : modele/Trace.class.php
 // Rôle : la classe Trace représente une trace ou un parcours

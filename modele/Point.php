@@ -1,7 +1,4 @@
 <?php
-namespace modele;
-
-use Exception;
 // Projet TraceGPS
 // fichier : modele/Point.class.php
 // Rôle : la classe Point représente un point géographique

@@ -1,6 +1,5 @@
 <?php
 
-namespace api\services;
 // Projet TraceGPS - services web
 // fichier :  api/services/ValiderDemandeAutorisation.php
 // Dernière mise à jour : 3/7/2021 par dP
@@ -20,11 +19,9 @@ namespace api\services;
 // ces variables globales sont définies dans le fichier modele/parametres.php
 global $ADR_MAIL_EMETTEUR, $ADR_SERVICE_WEB;
 
-use modele\Outils;
-use DOMDocument;
+include_once ('../modele/Outils.php');
 
 // connexion du serveur web à la base MySQL
-use modele\DAO;
 $dao = new DAO();
 
 // Récupération des données transmises
